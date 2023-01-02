@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DastanSkeletonCode.Dastan.Players
+namespace DastanSkeletonCode
 {
 	class Player
 	{

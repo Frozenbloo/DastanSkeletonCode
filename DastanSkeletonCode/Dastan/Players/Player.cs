@@ -8,6 +8,7 @@ namespace DastanSkeletonCode
 	{
 		private string Name;
 		private int Direction, Score;
+		private bool WafrAwarded;
 		private MoveOptionQueue Queue = new MoveOptionQueue();
 
 		public Player(string N, int D)
@@ -66,6 +67,16 @@ namespace DastanSkeletonCode
 		public int GetDirection()
 		{
 			return Direction;
+		}
+
+		public bool GetWafrAwarded()
+		{
+			return WafrAwarded;
+		}
+
+		public void SetWafrAwarded(bool wafrAwarded)
+		{
+			WafrAwarded = wafrAwarded;
 		}
 
 		public void ChangeScore(int Amount)

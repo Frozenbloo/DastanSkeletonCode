@@ -37,7 +37,7 @@ namespace DastanSkeletonCode
 			CreateBoard();
 			CreatePieces(NoOfPieces);
 			CurrentPlayer = Players[0];
-		}
+        }
 
 		/// <summary>
 		/// <c>DisplayBoard</c> draws the board.
@@ -259,6 +259,12 @@ namespace DastanSkeletonCode
 				DisplayState();
 				bool SquareIsValid = false;
 				int Choice;
+				//Award the Wafr
+				if (!CurrentPlayer.GetWafrAwarded())
+				{
+					CurrentPlayer.SetWafrAwarded(AwardWafr());
+					if (CurrentPlayer.GetWafrAwarded()) Console.WriteLine("You have been awarded a Wafr! You can select any move from your queue for free this turn!");
+				}
 				do
 				{
 					Console.Write("Choose move option to use from queue (1 to 3) or 9 to take the offer: ");
@@ -498,5 +504,10 @@ namespace DastanSkeletonCode
 			Players[1].AddToMoveOptionQueue(CreateMoveOption("faujdar", -1));
 			Players[1].AddToMoveOptionQueue(CreateMoveOption("cuirassier", -1));
 		}
+
+		private Boolean AwardWafr()
+		{
+            return (new Random().Next(4) == 2) ? true : false;
+        }
 	}
 }

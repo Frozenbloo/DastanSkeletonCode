@@ -259,23 +259,30 @@ namespace DastanSkeletonCode
 				DisplayState();
 				bool SquareIsValid = false;
 				int Choice;
+				int maxChoice = 3;
 				//Award the Wafr
 				if (!CurrentPlayer.GetWafrAwarded())
 				{
 					CurrentPlayer.SetWafrAwarded(AwardWafr());
-					if (CurrentPlayer.GetWafrAwarded()) Console.WriteLine("You have been awarded a Wafr! You can select any move from your queue for free this turn!");
+					//If they get rewarded send message
+					if (CurrentPlayer.GetWafrAwarded())
+					{
+						Console.WriteLine("You have been awarded a Wafr! You can select any move from your queue for free this turn!");
+						maxChoice = 5;
+					}
 				}
 				do
 				{
-					Console.Write("Choose move option to use from queue (1 to 3) or 9 to take the offer: ");
+					if (CurrentPlayer.GetWafrAwarded()) Console.WriteLine("Choose move option to use from queue (1 to 5) As you have a Wafr you cannot take the offer: ");
+					else Console.Write("Choose move option to use from queue (1 to 3) or 9 to take the offer: ");
 					Choice = Convert.ToInt32(Console.ReadLine());
-					if (Choice == 9)
+					if (Choice == 9 && !CurrentPlayer.GetWafrAwarded())
 					{
 						UseMoveOptionOffer();
 						DisplayState();
 					}
 				}
-				while (Choice < 1 || Choice > 3);
+				while (Choice < 1 || Choice > maxChoice);
 				int StartSquareReference = 0;
 				while (!SquareIsValid)
 				{
@@ -293,12 +300,13 @@ namespace DastanSkeletonCode
 				if (MoveLegal)
 				{
 					int PointsForPieceCapture = CalculatePieceCapturePoints(FinishSquareReference);
-					CurrentPlayer.ChangeScore(-(Choice + (2 * (Choice - 1))));
+					if (!CurrentPlayer.GetWafrAwarded()) CurrentPlayer.ChangeScore(-(Choice + (2 * (Choice - 1))));				
 					CurrentPlayer.UpdateQueueAfterMove(Choice);
 					UpdateBoard(StartSquareReference, FinishSquareReference);
 					UpdatePlayerScore(PointsForPieceCapture);
 					Console.WriteLine("New score: " + CurrentPlayer.GetScore() + Environment.NewLine);
 				}
+				CurrentPlayer.SetWafrAwarded(false);
 				if (CurrentPlayer.SameAs(Players[0]))
 				{
 					CurrentPlayer = Players[1];

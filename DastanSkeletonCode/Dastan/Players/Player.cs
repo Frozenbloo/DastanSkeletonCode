@@ -78,5 +78,10 @@ namespace DastanSkeletonCode
 			MoveOption Temp = Queue.GetMoveOptionInPosition(Pos - 1);
 			return Temp.CheckIfThereIsAMoveToSquare(StartSquareReference, FinishSquareReference);
 		}
+
+		public string GetJustQueueAsString()
+		{
+			return this.Queue.GetQueueAsString();
+		}
 	}
 }

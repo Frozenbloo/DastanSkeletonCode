@@ -16,7 +16,7 @@ namespace DastanSkeletonCode
 		protected int NoOfRows, NoOfColumns, MoveOptionOfferPosition;
 		protected List<Player> Players = new List<Player>();
 		protected List<string> MoveOptionOffer = new List<string>();
-		protected Player CurrentPlayer;
+		protected Player CurrentPlayer, OpposingPlayer;
 		protected Random RGen = new Random();
 
 		/// <summary>
@@ -37,6 +37,7 @@ namespace DastanSkeletonCode
 			CreateBoard();
 			CreatePieces(NoOfPieces);
 			CurrentPlayer = Players[0];
+			OpposingPlayer = Players[1];
 		}
 
 		/// <summary>
@@ -261,11 +262,17 @@ namespace DastanSkeletonCode
 				int Choice;
 				do
 				{
-					Console.Write("Choose move option to use from queue (1 to 3) or 9 to take the offer: ");
+					Console.Write("Choose move option to use from queue (1 to 3), 8 to spy on your opponents queue, or 9 to take the offer: ");
 					Choice = Convert.ToInt32(Console.ReadLine());
 					if (Choice == 9)
 					{
 						UseMoveOptionOffer();
+						DisplayState();
+					}
+					else if (Choice == 8)
+					{
+						Console.WriteLine("\n                    --< Opponent's Queue >--\n{0}\n                    ------------------------", OpposingPlayer.GetJustQueueAsString());
+						CurrentPlayer.ChangeScore(-5);
 						DisplayState();
 					}
 				}
@@ -295,10 +302,12 @@ namespace DastanSkeletonCode
 				}
 				if (CurrentPlayer.SameAs(Players[0]))
 				{
+					OpposingPlayer = CurrentPlayer;
 					CurrentPlayer = Players[1];
 				}
 				else
 				{
+					OpposingPlayer = CurrentPlayer;
 					CurrentPlayer = Players[0];
 				}
 				GameOver = CheckIfGameOver();

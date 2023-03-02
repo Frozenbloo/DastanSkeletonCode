@@ -131,6 +131,16 @@ namespace DastanSkeletonCode
 			}
 		}
 
+		private int GetValidInt()
+		{
+			while (true) 
+			{
+				string tempStr = Console.ReadLine();
+				if (int.TryParse(tempStr, out int value)) return value;
+				Console.Write("Invalid input. Please enter an integer: ");
+			}
+		}
+
 		/// <summary>
 		/// Checks to see if the Square is a valid move
 		/// </summary>
@@ -213,15 +223,20 @@ namespace DastanSkeletonCode
 		{
 			int SelectedSquare;
 			Console.Write("Enter the square " + Description + " (row number followed by column number): ");
-			SelectedSquare = Convert.ToInt32(Console.ReadLine());
+			SelectedSquare = GetValidInt();
 			return SelectedSquare;
 		}
 
 		private void UseMoveOptionOffer()
 		{
 			int ReplaceChoice;
-			Console.Write("Choose the move option from your queue to replace (1 to 5): ");
-			ReplaceChoice = Convert.ToInt32(Console.ReadLine());
+			while (true)
+			{
+				Console.Write("Choose the move option from your queue to replace (1 to 5): ");
+				ReplaceChoice = GetValidInt();
+				if (ReplaceChoice > 0 && ReplaceChoice <= 5) break;
+				Console.WriteLine("Invalid Option");
+			}
 			CurrentPlayer.UpdateMoveOptionQueueWithOffer(ReplaceChoice - 1, CreateMoveOption(MoveOptionOffer[MoveOptionOfferPosition], CurrentPlayer.GetDirection()));
 			CurrentPlayer.ChangeScore(-(10 - (ReplaceChoice * 2)));
 			MoveOptionOfferPosition = RGen.Next(0, 5);
@@ -259,15 +274,16 @@ namespace DastanSkeletonCode
 				DisplayState();
 				bool SquareIsValid = false;
 				int Choice;
+				Console.Write("Choose move option to use from queue (1 to 3) or 9 to take the offer: ");
 				do
 				{
-					Console.Write("Choose move option to use from queue (1 to 3) or 9 to take the offer: ");
-					Choice = Convert.ToInt32(Console.ReadLine());
+					Choice = GetValidInt();
 					if (Choice == 9)
 					{
 						UseMoveOptionOffer();
 						DisplayState();
 					}
+					if (Choice < 1 || Choice > 3) Console.Write("Invalid Choice. Please choose move option to use from queue (1 to 3) or 9 to take the offer: ");
 				}
 				while (Choice < 1 || Choice > 3);
 				int StartSquareReference = 0;
@@ -275,6 +291,7 @@ namespace DastanSkeletonCode
 				{
 					StartSquareReference = GetSquareReference("containing the piece to move");
 					SquareIsValid = CheckSquareIsValid(StartSquareReference, true);
+					if (!SquareIsValid) Console.WriteLine("Invalid Square");
 				}
 				int FinishSquareReference = 0;
 				SquareIsValid = false;
@@ -282,6 +299,7 @@ namespace DastanSkeletonCode
 				{
 					FinishSquareReference = GetSquareReference("to move to");
 					SquareIsValid = CheckSquareIsValid(FinishSquareReference, false);
+					if (!SquareIsValid) Console.WriteLine("Invalid Square");
 				}
 				bool MoveLegal = CurrentPlayer.CheckPlayerMove(Choice, StartSquareReference, FinishSquareReference);
 				if (MoveLegal)

@@ -89,6 +89,7 @@ namespace DastanSkeletonCode
 		private void DisplayState()
 		{
 			DisplayBoard();
+			Console.WriteLine();
 			Console.WriteLine("Move option offer: " + MoveOptionOffer[MoveOptionOfferPosition]);
 			Console.WriteLine();
 			Console.WriteLine(CurrentPlayer.GetPlayerStateAsString());
@@ -220,12 +221,17 @@ namespace DastanSkeletonCode
 		private void UseMoveOptionOffer()
 		{
 			int ReplaceChoice;
+			string moveOptionLeft = "You can use the Offer {0} more times!";
 			Console.Write("Choose the move option from your queue to replace (1 to 5): ");
 			ReplaceChoice = Convert.ToInt32(Console.ReadLine());
 			CurrentPlayer.UpdateMoveOptionQueueWithOffer(ReplaceChoice - 1, CreateMoveOption(MoveOptionOffer[MoveOptionOfferPosition], CurrentPlayer.GetDirection()));
 			CurrentPlayer.ChangeScore(-(10 - (ReplaceChoice * 2)));
 			MoveOptionOfferPosition = RGen.Next(0, 5);
-		}
+			CurrentPlayer.DecreaseChoiceOptions();
+			if (CurrentPlayer.GetChoiceOptionsLeft() == 1) moveOptionLeft = "You can use the Offer {0} more time!";
+			else if (CurrentPlayer.GetChoiceOptionsLeft() == 0) moveOptionLeft = "You have used all your Offers!";
+            Console.WriteLine(moveOptionLeft, CurrentPlayer.GetChoiceOptionsLeft());
+        }
 
 		private int GetPointsForOccupancyByPlayer(Player CurrentPlayer)
 		{
@@ -258,16 +264,21 @@ namespace DastanSkeletonCode
 			{
 				DisplayState();
 				bool SquareIsValid = false;
-				int Choice;
+				int Choice = -1;
+				string moveChoiceStr = "";
 				do
 				{
-					Console.Write("Choose move option to use from queue (1 to 3) or 9 to take the offer: ");
-					Choice = Convert.ToInt32(Console.ReadLine());
-					if (Choice == 9)
-					{
-						UseMoveOptionOffer();
-						DisplayState();
-					}
+					moveChoiceStr = null;
+					moveChoiceStr += "Choose move option to use from queue (1 to 3)";
+
+                    if (CurrentPlayer.HasChoiceOptionsLeft())  moveChoiceStr += " or 9 to take the offer";
+					Console.Write(moveChoiceStr += ": ");
+                    Choice = Convert.ToInt32(Console.ReadLine());
+                    if (Choice == 9 && CurrentPlayer.HasChoiceOptionsLeft())
+                    {
+                        UseMoveOptionOffer();
+                        DisplayState();
+                    }  
 				}
 				while (Choice < 1 || Choice > 3);
 				int StartSquareReference = 0;

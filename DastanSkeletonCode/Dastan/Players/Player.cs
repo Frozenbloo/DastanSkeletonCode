@@ -7,12 +7,13 @@ namespace DastanSkeletonCode
 	class Player
 	{
 		private string Name;
-		private int Direction, Score;
+		private int Direction, Score, ChoiceOptionsLeft;
 		private MoveOptionQueue Queue = new MoveOptionQueue();
 
 		public Player(string N, int D)
 		{
 			Score = 100;
+			ChoiceOptionsLeft = 3;
 			Name = N;
 			Direction = D;
 		}
@@ -32,6 +33,12 @@ namespace DastanSkeletonCode
 				return false;
 			}
 		}
+
+		public bool HasChoiceOptionsLeft() { return ChoiceOptionsLeft > 0;}
+
+		public int GetChoiceOptionsLeft() { return ChoiceOptionsLeft; }
+
+		public void DecreaseChoiceOptions() { this.ChoiceOptionsLeft--; }
 
 		public string GetPlayerStateAsString()
 		{

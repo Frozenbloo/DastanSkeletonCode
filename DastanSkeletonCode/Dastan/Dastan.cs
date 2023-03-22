@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace DastanSkeletonCode
@@ -18,14 +19,16 @@ namespace DastanSkeletonCode
 		protected List<string> MoveOptionOffer = new List<string>();
 		protected Player CurrentPlayer;
 		protected Random RGen = new Random();
+		protected int NoOfPieces;
+		protected string PlayerOnePiece = "!", PlayerTwoPiece = "\"";
 
-		/// <summary>
-		/// The main constructor for the Dastan Class
-		/// </summary>
-		/// <param name="R">The number of Rows the board should have</param>
-		/// <param name="C">The number of Columns the board should have</param>
-		/// <param name="NoOfPieces">The number of pieces</param>
-		public Dastan(int R, int C, int NoOfPieces)
+        /// <summary>
+        /// The main constructor for the Dastan Class
+        /// </summary>
+        /// <param name="R">The number of Rows the board should have</param>
+        /// <param name="C">The number of Columns the board should have</param>
+        /// <param name="NoOfPieces">The number of pieces</param>
+        public Dastan(int R, int C, int NoOfPieces)
 		{
 			Players.Add(new Player("Player One", 1));
 			Players.Add(new Player("Player Two", -1));
@@ -36,6 +39,7 @@ namespace DastanSkeletonCode
 			CreateMoveOptionOffer();
 			CreateBoard();
 			CreatePieces(NoOfPieces);
+			this.NoOfPieces = NoOfPieces;
 			CurrentPlayer = Players[0];
 		}
 
@@ -286,6 +290,7 @@ namespace DastanSkeletonCode
 				bool MoveLegal = CurrentPlayer.CheckPlayerMove(Choice, StartSquareReference, FinishSquareReference);
 				if (MoveLegal)
 				{
+					CheckReincarnation(FinishSquareReference);
 					int PointsForPieceCapture = CalculatePieceCapturePoints(FinishSquareReference);
 					CurrentPlayer.ChangeScore(-(Choice + (2 * (Choice - 1))));
 					CurrentPlayer.UpdateQueueAfterMove(Choice);
@@ -355,7 +360,12 @@ namespace DastanSkeletonCode
 
 		private void CreatePieces(int NoOfPieces)
 		{
-			Piece CurrentPiece;
+            NoOfPieces = 2;
+            Board[GetIndexOfSquare(51)].SetPiece(new Piece("piece", Players[0], 1, "!"));
+            Board[GetIndexOfSquare(21)].SetPiece(new Piece("piece", Players[1], 1, "\""));
+            Board[GetIndexOfSquare(54)].SetPiece(new Piece("piece", Players[1], 1, "\""));
+
+            Piece CurrentPiece;
 			for (int Count = 1; Count <= NoOfPieces; Count++)
 			{
 				CurrentPiece = new Piece("piece", Players[0], 1, "!");
@@ -370,9 +380,9 @@ namespace DastanSkeletonCode
 			}
 			CurrentPiece = new Piece("mirza", Players[1], 5, "2");
 			Board[GetIndexOfSquare(NoOfRows * 10 + (NoOfColumns / 2 + 1))].SetPiece(CurrentPiece);
-		}
+        }
 
-		private void CreateMoveOptionOffer()
+        private void CreateMoveOptionOffer()
 		{
 			MoveOptionOffer.Add("jazair");
 			MoveOptionOffer.Add("chowkidar");
@@ -498,5 +508,58 @@ namespace DastanSkeletonCode
 			Players[1].AddToMoveOptionQueue(CreateMoveOption("faujdar", -1));
 			Players[1].AddToMoveOptionQueue(CreateMoveOption("cuirassier", -1));
 		}
-	}
+
+		private int CountNormalPieces()
+		{
+			int count = 0;
+			foreach (Square square in Board)
+			{
+				Piece piece = square.GetPieceInSquare();
+				if (piece != null && !piece.GetTypeOfPiece().Equals("mirza"))
+				{
+                    if (piece.GetBelongsTo().SameAs(CurrentPlayer)) count++;
+                }
+			}
+			return count;
+		}
+
+		private void CheckReincarnation(int FinishSquareReference)
+		{
+			int Row = FinishSquareReference / 10;
+			int Player1Row = NoOfRows, Player2Row = 1;
+			if (CurrentPlayer.GetName() == "Player One" && Row == Player1Row)
+			{
+				BeginReincarnation(Row, CurrentPlayer, 1);
+			}
+			else if (CurrentPlayer.GetName() == "Player Two" && Row == Player2Row)
+			{
+                BeginReincarnation(Row, CurrentPlayer, NoOfRows);
+            }
+		}
+
+		private void BeginReincarnation(int Row, Player currentPlayer, int otherRow)
+		{
+			if (CountNormalPieces() < NoOfPieces)
+			{
+                Console.WriteLine("==============\nREINCARNATION!\n==============");
+				int reincarnationColumn = -1;
+				bool isColumnSqareEmpty = false;
+				while (!isColumnSqareEmpty)
+				{
+                    Console.Write("Please enter the COLUMN you would like the piece to spawn: ");
+                    reincarnationColumn = int.Parse(Console.ReadLine());
+                    isColumnSqareEmpty = CheckSquareIsValid((otherRow*10) + reincarnationColumn, false);
+					if (isColumnSqareEmpty) break;
+                }
+				if (currentPlayer.GetName() == "Player One")
+				{
+					if (isColumnSqareEmpty) Board[GetIndexOfSquare((otherRow * 10) + reincarnationColumn)].SetPiece(new Piece("piece", currentPlayer, 1, PlayerOnePiece));
+                }
+				if (currentPlayer.GetName() == "Player Two")
+				{
+                    if (isColumnSqareEmpty) Board[GetIndexOfSquare((otherRow * 10) + reincarnationColumn)].SetPiece(new Piece("piece", currentPlayer, 1, PlayerTwoPiece));
+                }
+            }
+		}
+    }
 }

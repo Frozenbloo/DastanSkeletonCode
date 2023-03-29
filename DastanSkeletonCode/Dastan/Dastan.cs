@@ -304,7 +304,6 @@ namespace DastanSkeletonCode
 						CurrentPlayer.ChangeScore(-CurrentPlayer.GetScore() + ScoreBeforeMove);
 						CurrentPlayer.ChangeScore(-5);
 						CurrentPlayer.ResetQueueBackAfterUndo(Choice);
-                        //Board = BoardBefore;
                         UpdateBoard(FinishSquareReference, StartSquareReference);
 					}
 				}

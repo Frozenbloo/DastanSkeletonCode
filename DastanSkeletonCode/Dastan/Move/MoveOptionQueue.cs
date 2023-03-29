@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace DastanSkeletonCode
@@ -66,5 +67,12 @@ namespace DastanSkeletonCode
 		{
 			return Queue[Pos];
 		}
-	}
+
+		public void ResetQueueBack(int Position)
+		{
+			var move = Queue.Last();
+			Queue.Remove(move);
+			Queue.Insert(Position, move);
+		}
+    }
 }

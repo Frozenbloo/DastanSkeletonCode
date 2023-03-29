@@ -253,7 +253,8 @@ namespace DastanSkeletonCode
 
 		public void PlayGame()
 		{
-			bool GameOver = false;
+            List<Square> BoardBefore = Board;
+            bool GameOver = false;
 			while (!GameOver)
 			{
 				DisplayState();
@@ -284,24 +285,41 @@ namespace DastanSkeletonCode
 					SquareIsValid = CheckSquareIsValid(FinishSquareReference, false);
 				}
 				bool MoveLegal = CurrentPlayer.CheckPlayerMove(Choice, StartSquareReference, FinishSquareReference);
-				if (MoveLegal)
+				string choice = "not used";
+                if (MoveLegal)
 				{
+					int ScoreBeforeMove = CurrentPlayer.GetScore();
 					int PointsForPieceCapture = CalculatePieceCapturePoints(FinishSquareReference);
-					CurrentPlayer.ChangeScore(-(Choice + (2 * (Choice - 1))));
+                    CurrentPlayer.ChangeScore(-(Choice + (2 * (Choice - 1))));
 					CurrentPlayer.UpdateQueueAfterMove(Choice);
 					UpdateBoard(StartSquareReference, FinishSquareReference);
 					UpdatePlayerScore(PointsForPieceCapture);
 					Console.WriteLine("New score: " + CurrentPlayer.GetScore() + Environment.NewLine);
+					DisplayBoard();
+					Console.Write("Would you like to undo your move? [ -5 Points ] (y/n): ");
+					choice = Console.ReadLine().ToLower();
+					Console.WriteLine("\n");
+					if (choice == "y")
+					{
+						CurrentPlayer.ChangeScore(-CurrentPlayer.GetScore() + ScoreBeforeMove);
+						CurrentPlayer.ChangeScore(-5);
+						CurrentPlayer.ResetQueueBackAfterUndo(Choice);
+                        //Board = BoardBefore;
+                        UpdateBoard(FinishSquareReference, StartSquareReference);
+					}
 				}
-				if (CurrentPlayer.SameAs(Players[0]))
+				if (choice != "y")
 				{
-					CurrentPlayer = Players[1];
-				}
-				else
-				{
-					CurrentPlayer = Players[0];
-				}
-				GameOver = CheckIfGameOver();
+                    if (CurrentPlayer.SameAs(Players[0]))
+                    {
+                        CurrentPlayer = Players[1];
+                    }
+                    else
+                    {
+                        CurrentPlayer = Players[0];
+                    }
+                    GameOver = CheckIfGameOver();
+                }
 			}
 			DisplayState();
 			DisplayFinalResult();

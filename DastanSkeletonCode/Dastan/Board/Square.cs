@@ -60,5 +60,10 @@ namespace DastanSkeletonCode
 				return false;
 			}
 		}
+
+		public virtual bool GetCampedTwoTurns()
+		{
+			return false;
+		}
 	}
 }

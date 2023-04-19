@@ -18,6 +18,7 @@ namespace DastanSkeletonCode
 		protected List<string> MoveOptionOffer = new List<string>();
 		protected Player CurrentPlayer;
 		protected Random RGen = new Random();
+		protected int TazizLocation;
 
 		/// <summary>
 		/// The main constructor for the Dastan Class
@@ -286,11 +287,16 @@ namespace DastanSkeletonCode
 				bool MoveLegal = CurrentPlayer.CheckPlayerMove(Choice, StartSquareReference, FinishSquareReference);
 				if (MoveLegal)
 				{
-					int PointsForPieceCapture = CalculatePieceCapturePoints(FinishSquareReference);
-					CurrentPlayer.ChangeScore(-(Choice + (2 * (Choice - 1))));
+                    int PointsForPieceCapture = CalculatePieceCapturePoints(FinishSquareReference);
+
 					CurrentPlayer.UpdateQueueAfterMove(Choice);
 					UpdateBoard(StartSquareReference, FinishSquareReference);
-					UpdatePlayerScore(PointsForPieceCapture);
+                    if (!Board[TazizLocation].GetCampedTwoTurns())
+                    {
+                        CurrentPlayer.ChangeScore(-(Choice + (2 * (Choice - 1))));
+                    }
+                    else Console.WriteLine("CAMPED AT THE TA'ZIZ!\nThis move is now free!");
+                    UpdatePlayerScore(PointsForPieceCapture);
 					Console.WriteLine("New score: " + CurrentPlayer.GetScore() + Environment.NewLine);
 				}
 				if (CurrentPlayer.SameAs(Players[0]))
@@ -344,6 +350,11 @@ namespace DastanSkeletonCode
 					{
 						S = new Kotla(Players[1], "k");
 					}
+					else if (Row == NoOfRows / 2 && Column == NoOfColumns / 2)
+					{
+						S = new Ta_ziz("x");
+						TazizLocation = Board.Count;
+					}	
 					else
 					{
 						S = new Square();
